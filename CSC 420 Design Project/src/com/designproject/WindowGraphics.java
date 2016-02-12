@@ -29,7 +29,6 @@ public class WindowGraphics {
 		
 		mainWindow.pack();
 		mainWindow.setVisible(true);
-		Graphics g = getGraphics();
 	}
 	
 	private static void paint (Graphics g) {
