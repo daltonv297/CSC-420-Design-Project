@@ -1,48 +1,48 @@
 package com.designproject;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+ 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
+ 
 
-public class WindowGraphics {
+public class WindowGraphics extends JFrame {
 	
-	private static int WIDTH = 800;
-	private static int HEIGHT = 450;	
-	
-	private static void createAndShowGUI()
-	{
-		JFrame mainWindow = new JFrame("Test");
-		
-		mainWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	
-		
-		JLabel emptyLabel = new JLabel();
-		emptyLabel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-		mainWindow.getContentPane().add(emptyLabel, BorderLayout.CENTER);
-		
-		mainWindow.pack();
-		mainWindow.setVisible(true);
-	}
-	
-	private static void paint (Graphics g) {
-	    Graphics2D g2 = (Graphics2D) g;
-	    g2.draw(new Line2D.Double(0, 0, 200, 200));
-
-	}
-	
-	public static void main(String[] args)
-	{
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	private int WIDTH = 1280;
+	private int HEIGHT = 720;
+ 
+    public WindowGraphics() {
+        super("Lines Drawing Demo");
+ 
+        setSize(WIDTH, HEIGHT);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+    }
+ 
+    void drawToScreen(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+ 
+        g2d.drawLine(120, 50, 460, 90);
+ 
+        g2d.draw(new Line2D.Double(59.2d, 99.8d, 419.1d, 99.8d));
+ 
+        g2d.draw(new Line2D.Float(21.50f, 132.50f, 459.50f, 132.50f));
+ 
+    }
+ 
+    public void paint(Graphics g) {
+        super.paint(g);
+        drawToScreen(g);
+    }
+ 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                createAndShowGUI();
+                new WindowGraphics().setVisible(true);
             }
         });
-	}
+    }
 }
