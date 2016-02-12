@@ -10,10 +10,9 @@ public class Game extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final double aspectRatio = 16 / 9;
+	public static final double aspectRatio = 16D / 9D;
 	public static final int WIDTH = 1280;
-	public static final int HEIGHT = (int) (WIDTH * aspectRatio);
-	
+	public static final int HEIGHT = (int) (WIDTH / aspectRatio);
 	public static final String NAME = "TreeFiddy";
 	
 	private JFrame frame;
@@ -39,15 +38,44 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	public synchronized void start() {
-		new Thread(this).start();
 		running = true;
+		new Thread(this).start();
 	}
 	
 	public synchronized void stop() {
-		
+		running = false;
 	}
 
 	public void run() {
+		long lastTime = System.nanoTime();
+		double nsPerTick = 1000000000D/60D;
+		
+		int ticks = 0;
+		int frames = 0;
+		
+		long lastTimer = System.currentTimeMillis();
+		double delta = 0;
+		
+		while (running) {
+			long now = System.nanoTime();
+			delta += (now - lastTime) / nsPerTick;
+			lastTime = now;
+			
+			while (delta >= 1) {
+				ticks++;
+				tick();
+				delta -= 1;
+			}
+			tick();
+			render();
+		}
+	}
+	
+	public void tick() {
+		
+	}
+	
+	public void render() {
 		
 	}
 	
