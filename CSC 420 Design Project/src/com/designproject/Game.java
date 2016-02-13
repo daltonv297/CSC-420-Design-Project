@@ -15,8 +15,8 @@ public class Game extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final double aspectRatio = 4D / 3D;				//sets window resolution and aspect ratio
-	public static final int HEIGHT = 480;
+	public static final double aspectRatio = 16D / 9D;				//sets window resolution and aspect ratio
+	public static final int HEIGHT = 720;
 	public static final int WIDTH = (int) (HEIGHT * aspectRatio);
 	public static final String NAME = "TreeFiddy";
 	
