@@ -2,7 +2,12 @@ package com.designproject;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
@@ -10,14 +15,18 @@ public class Game extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final double aspectRatio = 16D / 9D;
-	public static final int WIDTH = 1280;
-	public static final int HEIGHT = (int) (WIDTH / aspectRatio);
+	public static final double aspectRatio = 4D / 3D;				//sets window resolution and aspect ratio
+	public static final int HEIGHT = 480;
+	public static final int WIDTH = (int) (HEIGHT * aspectRatio);
 	public static final String NAME = "TreeFiddy";
 	
 	private JFrame frame;
 	
 	public boolean running = false;
+	public int tickCount = 0;
+	
+	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+	private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();	//gets pixel array from raster image
 	
 	public Game() {
 		setMinimumSize(new Dimension(WIDTH, HEIGHT));
@@ -45,6 +54,12 @@ public class Game extends Canvas implements Runnable {
 	public synchronized void stop() {
 		running = false;
 	}
+	
+	/* 
+	 * The following method allows for separation of game updates (ticks) and the amount of frames rendered.
+	 * This way, game logic will not speed up or slow down when run on different systems, but the framerate
+	 * is not locked. (Yay, more FPS!)
+	 */
 
 	public void run() {
 		long lastTime = System.nanoTime();
@@ -60,23 +75,56 @@ public class Game extends Canvas implements Runnable {
 			long now = System.nanoTime();
 			delta += (now - lastTime) / nsPerTick;
 			lastTime = now;
+			boolean shouldRender = true;	//change to false to limit FPS
 			
 			while (delta >= 1) {
 				ticks++;
 				tick();
 				delta -= 1;
+				shouldRender = true;
 			}
-			tick();
-			render();
+			
+			try {
+				Thread.sleep(2);					//causes the thread to sleep for 2ms and lowers the amount of frames
+			} catch (InterruptedException e) {		//rendered (may not be necessary)
+				e.printStackTrace();
+			}
+			
+			if (shouldRender) {
+				frames++;
+				render();
+			}
+		
+			if (System.currentTimeMillis() - lastTimer >= 1000) {
+				lastTimer += 1000;
+				System.out.println("ticks: " + ticks + "  frames: " + frames);
+				frames = ticks = 0;
+			}
 		}
 	}
 	
 	public void tick() {
+		tickCount++;
 		
+		for (int i = 0; i < pixels.length; i++) {
+			pixels[i] = i + tickCount;
+		}
 	}
 	
 	public void render() {
+		BufferStrategy bs = getBufferStrategy();	//a BufferStrategy object contains the mechanism of how complex 
+													//memory will be organized on our Canvas
+		if (bs == null) {
+			createBufferStrategy(2);				//create a double-buffering strategy (change to 3 if tearing occurs)
+			return;
+		}
 		
+		Graphics g = bs.getDrawGraphics();			//gets our graphics context for drawing to the Canvas
+		
+		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+		
+		g.dispose();
+		bs.show();
 	}
 	
 	public static void main(String[] args) {
