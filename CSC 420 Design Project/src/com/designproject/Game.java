@@ -11,6 +11,9 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
+import com.designproject.gfx.Screen;
+import com.designproject.gfx.SpriteSheet;
+
 public class Game extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = 1L;
@@ -28,6 +31,9 @@ public class Game extends Canvas implements Runnable {
 	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();	//gets pixel array from raster image
 	
+	private Screen screen;
+	public Input input;
+	
 	public Game() {
 		setMinimumSize(new Dimension(WIDTH, HEIGHT));
 		setMaximumSize(new Dimension(WIDTH, HEIGHT));
@@ -44,6 +50,11 @@ public class Game extends Canvas implements Runnable {
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+	}
+	
+	public void init() {
+		screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
+		input = new Input(this);
 	}
 	
 	public synchronized void start() {
@@ -70,6 +81,8 @@ public class Game extends Canvas implements Runnable {
 		
 		long lastTimer = System.currentTimeMillis();
 		double delta = 0;
+		
+		init();
 		
 		while (running) {
 			long now = System.nanoTime();
@@ -106,8 +119,17 @@ public class Game extends Canvas implements Runnable {
 	public void tick() {
 		tickCount++;
 		
-		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = i + tickCount;
+		if (input.up.isPressed()) {
+			screen.yOffset--;
+		}
+		if (input.down.isPressed()) {
+			screen.yOffset++;
+		}
+		if (input.left.isPressed()) {
+			screen.xOffset--;
+		}
+		if (input.right.isPressed()) {
+			screen.xOffset++;
 		}
 	}
 	
@@ -119,9 +141,13 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 		
+		screen.render(pixels, 0, WIDTH);
+		
 		Graphics g = bs.getDrawGraphics();			//gets our graphics context for drawing to the Canvas
 		
 		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+		g.setColor(Color.BLACK);
+		g.drawRect(0, 0, getWidth(), getHeight());
 		
 		g.dispose();
 		bs.show();
