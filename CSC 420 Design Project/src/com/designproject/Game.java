@@ -172,6 +172,7 @@ public class Game extends Canvas implements Runnable {
 		
 		g.dispose();
 		bs.show();
+		System.out.println("test please remove this");
 	}
 	
 	public static void main(String[] args) {
