@@ -5,10 +5,14 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import com.designproject.gfx.Screen;
@@ -28,8 +32,13 @@ public class Game extends Canvas implements Runnable {
 	public boolean running = false;
 	public int tickCount = 0;
 	
-	private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-	private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();	//gets pixel array from raster image
+	int xPos = 0;
+	int yPos = 0;
+	
+	//private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+	//private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();	//gets pixel array from raster image
+	
+	BufferedImage testimg = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	
 	private Screen screen;
 	public Input input;
@@ -50,10 +59,23 @@ public class Game extends Canvas implements Runnable {
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		
+		
+		
 	}
 	
 	public void init() {
-		screen = new Screen(WIDTH, HEIGHT, new SpriteSheet("/sprite_sheet.png"));
+		try {
+			testimg = ImageIO.read(getClass().getResource("/testimg.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		xPos = getWidth() / 2 - testimg.getWidth() / 4;
+		yPos = getHeight() / 2 - testimg.getHeight() / 4;
+		
+		System.out.println("xPos: " + xPos + " yPos: " + yPos);
+		
 		input = new Input(this);
 	}
 	
@@ -120,16 +142,16 @@ public class Game extends Canvas implements Runnable {
 		tickCount++;
 		
 		if (input.up.isPressed()) {
-			screen.yOffset--;
+			yPos--;
 		}
 		if (input.down.isPressed()) {
-			screen.yOffset++;
+			yPos++;
 		}
 		if (input.left.isPressed()) {
-			screen.xOffset--;
+			xPos--;
 		}
 		if (input.right.isPressed()) {
-			screen.xOffset++;
+			xPos++;
 		}
 	}
 	
@@ -141,13 +163,12 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 		
-		screen.render(pixels, 0, WIDTH);
-		
+		//screen.render(pixels, 0, WIDTH);
+		setBackground(Color.RED);
 		Graphics g = bs.getDrawGraphics();			//gets our graphics context for drawing to the Canvas
+		paint(g);
 		
-		g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
-		g.setColor(Color.BLACK);
-		g.drawRect(0, 0, getWidth(), getHeight());
+		g.drawImage(testimg, xPos, yPos, testimg.getWidth() / 2, testimg.getHeight() / 2, null);
 		
 		g.dispose();
 		bs.show();

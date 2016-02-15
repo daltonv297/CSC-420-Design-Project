@@ -21,12 +21,14 @@ public class Screen {
 		this.height = height;
 		this.sheet = sheet;
 		
+		
 		for (int i = 0; i < MAP_WIDTH * MAP_WIDTH; i++) {
 			colors[i*4+0] = 0xff00ff;							//sets which colors in sprite_sheet.png will
 			colors[i*4+1] = 0x0000ff;							//correspond to actual colors used
 			colors[i*4+2] = 0xffff00;
 			colors[i*4+3] = 0xffffff;
 		}
+		
 	}
 	
 	public void render(int[] pixels, int offset, int row) {
