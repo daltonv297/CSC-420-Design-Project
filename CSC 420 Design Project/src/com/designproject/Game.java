@@ -36,7 +36,7 @@ public class Game extends Canvas implements Runnable {
 	//private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	//private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();	//gets pixel array from raster image
 	
-	BufferedImage testimg = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+	//BufferedImage testimg = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	
 	public Input input;
 	
@@ -62,11 +62,13 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	public void init() {
+		/*
 		try {
 			testimg = ImageIO.read(getClass().getResource("/testimg.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		*/
 		
 		xPos = getWidth() / 2 - testimg.getWidth() / 4;
 		yPos = getHeight() / 2 - testimg.getHeight() / 4;
@@ -159,18 +161,11 @@ public class Game extends Canvas implements Runnable {
 			createBufferStrategy(2);				//create a double-buffering strategy (change to 3 if tearing occurs)
 			return;
 		}
-		
-		//screen.render(pixels, 0, WIDTH);
 		setBackground(Color.RED);
 		Graphics2D g = (Graphics2D) bs.getDrawGraphics();			//gets our graphics context for drawing to the Canvas
 		paint(g);
 		
-		//g.drawImage(testimg, xPos, yPos, testimg.getWidth() / 2, testimg.getHeight() / 2, null);
 		
-		g.setColor(Color.BLUE);
-		g.fillOval(getWidth() / 2 - 20, getHeight() / 3 - 20, 40, 40);
-		g.setColor(Color.BLACK);
-		g.drawLine(getWidth() / 2 - 10, getHeight() / 3 - 10, getWidth() / 2 + 50,  getHeight() / 3 + 50);
 		
 		g.dispose();
 		bs.show();

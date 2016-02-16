@@ -1,5 +1,6 @@
 package com.designproject;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -8,6 +9,9 @@ public class BinaryTree {
 	Node root;
 	int leafcounter;
 	boolean isRoot = false;
+	
+	private ArrayList<ArrayList<Node>> levelList = new ArrayList<ArrayList<Node>>();
+	private ArrayList<Node> tempList = new ArrayList<Node>();
 
 	public void addNode(int key, String name) {
 
@@ -357,23 +361,29 @@ public class BinaryTree {
 		return 0;
 	}
 
-	public void printLevel(Node focusNode, int level) {
+	public void addLevel(Node focusNode, int level) {
 		if (focusNode != null) {
 			
 			if (findDepth(root, focusNode) == level) {
-				System.out.println(focusNode);
+				tempList.add(focusNode);
 			}
-			printLevel(focusNode.leftChild, level);
-			printLevel(focusNode.rightChild, level);
+			addLevel(focusNode.leftChild, level);
+			addLevel(focusNode.rightChild, level);
 		}
 	}
 	
 	public void levelOrderTraverseTree() {
 		
 		for (int i = 0; i < findHeight(root); i++) {
-			printLevel(root, i);
+			addLevel(root, i);
+			levelList.add(new ArrayList<Node>(tempList));
+			tempList.clear();
 		}
 		
+	}
+	
+	public ArrayList<ArrayList<Node>> getList() {
+		return levelList;
 	}
 	
 	public void reverseInOrder(Node focusNode)
@@ -495,15 +505,13 @@ public class BinaryTree {
 		return focusNode;
 	}
 
-	public static void main(String[] args) {
-
-		BinaryTree theTree = new BinaryTree();
-		theTree.addNode(50, "Boss");
-		theTree.addNode(25, "Vice President");
-		theTree.addNode(15, "Office Manager");
-		theTree.addNode(30, "Secretary");
-		theTree.addNode(75, "Sales Manager");
-		theTree.addNode(85, "Salesman 1");
+	public BinaryTree(String[] args) {
+		addNode(50, "Boss");
+		addNode(25, "Vice President");
+		addNode(15, "Office Manager");
+		addNode(30, "Secretary");
+		addNode(75, "Sales Manager");
+		addNode(85, "Salesman 1");
 		//theTree.addNode(76, "Cool Dude");
 
 		// Different ways to traverse binary trees
@@ -543,15 +551,15 @@ public class BinaryTree {
 		
 		//theTree.deleteNode(85);
 		
-		theTree.preOrderTraverseTree(theTree.root);
+		preOrderTraverseTree(root);
 		
 		System.out.println("rearranging...");
 		
-		theTree.rearrangeTree();
+		rearrangeTree();
 		
 		System.out.println("rearranging complete");
 		
-		theTree.levelOrderTraverseTree();
+		levelOrderTraverseTree();
 		
 		
 
