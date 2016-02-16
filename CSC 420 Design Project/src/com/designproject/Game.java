@@ -5,6 +5,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
@@ -14,9 +15,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-
-import com.designproject.gfx.Screen;
-import com.designproject.gfx.SpriteSheet;
 
 public class Game extends Canvas implements Runnable {
 
@@ -40,7 +38,6 @@ public class Game extends Canvas implements Runnable {
 	
 	BufferedImage testimg = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	
-	private Screen screen;
 	public Input input;
 	
 	public Game() {
@@ -142,16 +139,16 @@ public class Game extends Canvas implements Runnable {
 		tickCount++;
 		
 		if (input.up.isPressed()) {
-			yPos--;
+			yPos -= 5;
 		}
 		if (input.down.isPressed()) {
-			yPos++;
+			yPos += 5;
 		}
 		if (input.left.isPressed()) {
-			xPos--;
+			xPos -= 5;
 		}
 		if (input.right.isPressed()) {
-			xPos++;
+			xPos += 5;
 		}
 	}
 	
@@ -165,10 +162,15 @@ public class Game extends Canvas implements Runnable {
 		
 		//screen.render(pixels, 0, WIDTH);
 		setBackground(Color.RED);
-		Graphics g = bs.getDrawGraphics();			//gets our graphics context for drawing to the Canvas
+		Graphics2D g = (Graphics2D) bs.getDrawGraphics();			//gets our graphics context for drawing to the Canvas
 		paint(g);
 		
-		g.drawImage(testimg, xPos, yPos, testimg.getWidth() / 2, testimg.getHeight() / 2, null);
+		//g.drawImage(testimg, xPos, yPos, testimg.getWidth() / 2, testimg.getHeight() / 2, null);
+		
+		g.setColor(Color.BLUE);
+		g.fillOval(getWidth() / 2 - 20, getHeight() / 3 - 20, 40, 40);
+		g.setColor(Color.BLACK);
+		g.drawLine(getWidth() / 2 - 10, getHeight() / 3 - 10, getWidth() / 2 + 50,  getHeight() / 3 + 50);
 		
 		g.dispose();
 		bs.show();
