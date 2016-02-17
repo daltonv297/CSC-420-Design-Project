@@ -1,23 +1,24 @@
 package com.designproject;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class BinaryTree {
 
-	Node root;
-	int leafcounter;
-	boolean isRoot = false;
+	private Node root;
+	private int leafcounter;
+	private boolean isRoot = false;
 	
 	private ArrayList<ArrayList<Node>> levelList = new ArrayList<ArrayList<Node>>();
 	private ArrayList<Node> tempList = new ArrayList<Node>();
 
-	public void addNode(int key, String name) {
+	public void addNode(Color color, int key) {
 
 		// Create a new Node and initialize it
 
-		Node newNode = new Node(key, name);
+		Node newNode = new Node(color, key);
 
 		// If there is no root this becomes root
 
@@ -505,7 +506,8 @@ public class BinaryTree {
 		return focusNode;
 	}
 
-	public BinaryTree(String[] args) {
+	public BinaryTree() {
+		/*
 		addNode(50, "Boss");
 		addNode(25, "Vice President");
 		addNode(15, "Office Manager");
@@ -561,7 +563,7 @@ public class BinaryTree {
 		
 		levelOrderTraverseTree();
 		
-		
+		*/
 
 		
 	}

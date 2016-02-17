@@ -27,6 +27,8 @@ public class Game extends Canvas implements Runnable {
 	
 	private JFrame frame;
 	
+	private BinaryTree tree;
+	
 	public boolean running = false;
 	public int tickCount = 0;
 	
@@ -70,12 +72,18 @@ public class Game extends Canvas implements Runnable {
 		}
 		*/
 		
-		xPos = getWidth() / 2 - testimg.getWidth() / 4;
-		yPos = getHeight() / 2 - testimg.getHeight() / 4;
+		//xPos = getWidth() / 2 - testimg.getWidth() / 4;
+		//yPos = getHeight() / 2 - testimg.getHeight() / 4;
 		
 		System.out.println("xPos: " + xPos + " yPos: " + yPos);
 		
 		input = new Input(this);
+		
+		tree = new BinaryTree();
+		
+		tree.addNode(new Node(Color.BLUE, 50));
+		tree.addNode(new Node(Color.GREEN, 25));
+		tree.addNode(new Node(Color.YELLOW, 75));
 	}
 	
 	public synchronized void start() {
@@ -165,10 +173,15 @@ public class Game extends Canvas implements Runnable {
 		Graphics2D g = (Graphics2D) bs.getDrawGraphics();			//gets our graphics context for drawing to the Canvas
 		paint(g);
 		
+		drawTree(g);
 		
 		
 		g.dispose();
 		bs.show();
+	}
+	
+	public void drawTree(Graphics2D g) {
+		
 	}
 	
 	public static void main(String[] args) {

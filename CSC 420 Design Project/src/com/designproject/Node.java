@@ -1,18 +1,25 @@
 package com.designproject;
 
-class Node {
+import java.awt.Color;
+
+public class Node {
+	Color color;
 	int key;
-	String name;
+	//String name;
 	Node leftChild;
 	Node rightChild;
 
-	Node(int key, String name) {
+	public Node(Color color, int key) {
+		this.color = color;
 		this.key = key;
-		this.name = name;
+		//this.name = name;
 	}
 
+	
+
+
 	public String toString() {
-		return name + " has the key " + key;
+		return color + " node has the key " + key;
 		/*
 		 * * return name + " has the key " + key + "\nLeft Child: " + leftChild
 		 * + "\nRight Child: " + rightChild + "\n";
