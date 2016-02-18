@@ -1,19 +1,9 @@
 package com.designproject;
 
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.*;
+import java.awt.geom.*;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 public class Game extends Canvas implements Runnable {
@@ -75,15 +65,14 @@ public class Game extends Canvas implements Runnable {
 		//xPos = getWidth() / 2 - testimg.getWidth() / 4;
 		//yPos = getHeight() / 2 - testimg.getHeight() / 4;
 		
-		System.out.println("xPos: " + xPos + " yPos: " + yPos);
 		
 		input = new Input(this);
 		
 		tree = new BinaryTree();
 		
-		tree.addNode(new Node(Color.BLUE, 50));
-		tree.addNode(new Node(Color.GREEN, 25));
-		tree.addNode(new Node(Color.YELLOW, 75));
+		tree.addNode(new Node(null, Color.BLUE, 50));
+		tree.addNode(new Node(null, Color.GREEN, 25));
+		tree.addNode(new Node(null, Color.YELLOW, 75));
 	}
 	
 	public synchronized void start() {
@@ -176,13 +165,32 @@ public class Game extends Canvas implements Runnable {
 		drawTree(g);
 		
 		
+		
 		g.dispose();
 		bs.show();
 	}
 	
 	public void drawTree(Graphics2D g) {
-		
+		if (tree.getRoot() != null) {
+			
+		}
 	}
+	
+	public Point getMiddle(int widthOfShape, int heightOfShape) {
+		return new Point(getWidth() / 2 - widthOfShape / 2, getHeight() / 2 - heightOfShape / 2);
+	}
+	
+	/*
+	public void fillOvalInMiddle(Graphics2D g, Shape s, int xOffset, int yOffset) {
+		s.getBounds().setLocation(new Point((int) (getWidth() / 2 - s.getBounds().getWidth()), 
+				(int) (getHeight() / 2 - s.getBounds().getHeight())));
+		//s.getBounds().setBounds(new Rectangle((int) (getWidth() / 2 - s.getBounds().getWidth()), 
+			//	(int) (getHeight() / 2 - s.getBounds().getHeight())));
+		System.out.println(s.getBounds2D().getBounds());
+		
+		g.fill(s);
+	}
+	*/
 	
 	public static void main(String[] args) {
 		new Game().start();

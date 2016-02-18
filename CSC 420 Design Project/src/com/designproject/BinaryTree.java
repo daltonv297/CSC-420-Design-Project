@@ -8,17 +8,20 @@ import java.util.Queue;
 public class BinaryTree {
 
 	private Node root;
-	private int leafcounter;
 	private boolean isRoot = false;
-	
+
 	private ArrayList<ArrayList<Node>> levelList = new ArrayList<ArrayList<Node>>();
 	private ArrayList<Node> tempList = new ArrayList<Node>();
+
+	public BinaryTree() {
+
+	}
 
 	public void addNode(Color color, int key) {
 
 		// Create a new Node and initialize it
 
-		Node newNode = new Node(color, key);
+		Node newNode = new Node(null, color, key);
 
 		// If there is no root this becomes root
 
@@ -60,6 +63,7 @@ public class BinaryTree {
 						// then place the new node on the left of it
 
 						parent.leftChild = newNode;
+						newNode.parent = parent;
 						return; // All Done
 
 					}
@@ -75,6 +79,7 @@ public class BinaryTree {
 						// then place the new node on the right of it
 
 						parent.rightChild = newNode;
+						newNode.parent = parent;
 						return; // All Done
 
 					}
@@ -85,7 +90,7 @@ public class BinaryTree {
 		}
 
 	}
-	
+
 	public void addNode(Node addThis) {
 
 		// Create a new Node and initialize it
@@ -130,6 +135,7 @@ public class BinaryTree {
 						// then place the new node on the left of it
 
 						parent.leftChild = addThis;
+						addThis.parent = parent;
 						return; // All Done
 
 					}
@@ -145,6 +151,7 @@ public class BinaryTree {
 						// then place the new node on the right of it
 
 						parent.rightChild = addThis;
+						addThis.parent = parent;
 						return; // All Done
 
 					}
@@ -154,6 +161,15 @@ public class BinaryTree {
 			}
 		}
 
+	}
+
+	public void addInOrder(Node addThis) {
+
+		if (root == null) {
+			root = addThis;
+			
+		}
+		int height = findHeight(root);
 	}
 
 	// All nodes are visited in ascending order
@@ -239,7 +255,7 @@ public class BinaryTree {
 		return focusNode;
 
 	}
-	
+
 	public Node findParent(int key) {
 
 		// Start at the top of the tree
@@ -248,24 +264,22 @@ public class BinaryTree {
 
 		// While we haven't found the Node
 		// keep looking
-		
+
 		if (focusNode.key == key) {
 			System.out.println("This node has no parent.");
 			isRoot = true;
 			return null;
 		}
-		
-		
 
 		while (true) {
-			
+
 			if (focusNode == null)
 				return null;
-			
+
 			else if (focusNode.leftChild == null && focusNode.rightChild == null) {
-				
+
 			}
-			
+
 			else if (focusNode.leftChild == null) {
 				if (focusNode.rightChild.key != key) {
 					focusNode = focusNode.rightChild;
@@ -273,7 +287,7 @@ public class BinaryTree {
 					break;
 				}
 			}
-			
+
 			else if (focusNode.rightChild == null) {
 				if (focusNode.leftChild.key != key) {
 					focusNode = focusNode.leftChild;
@@ -284,19 +298,19 @@ public class BinaryTree {
 
 			else if (focusNode.leftChild.key != key && focusNode.rightChild.key != key) {
 				// If we should search to the left
-	
+
 				if (key < focusNode.key) {
-	
+
 					// Shift the focus Node to the left child
-	
+
 					focusNode = focusNode.leftChild;
-	
+
 				} else {
-	
+
 					// Shift the focus Node to the right child
-	
+
 					focusNode = focusNode.rightChild;
-	
+
 				}
 			} else {
 				break;
@@ -304,14 +318,12 @@ public class BinaryTree {
 
 			// The node wasn't found
 
-			
-
 		}
 
 		return focusNode;
 
 	}
-	
+
 	public Node getRoot() {
 		return root;
 	}
@@ -338,7 +350,7 @@ public class BinaryTree {
 			return leafCount(focusNode.leftChild) + leafCount(focusNode.rightChild);
 		}
 	}
-	
+
 	public int smallCount(Node focusNode, int k) {
 		if (focusNode == null)
 			return 0;
@@ -347,24 +359,24 @@ public class BinaryTree {
 		else
 			return smallCount(focusNode.leftChild, k);
 	}
-	
+
 	public int findDepth(Node focusNode, Node depthNode) {
 		if (depthNode == null)
 			return -1;
 		if (focusNode != null && focusNode != depthNode) {
-			
+
 			if (focusNode.key < depthNode.key)
 				return 1 + findDepth(focusNode.rightChild, depthNode);
 			else if (focusNode.key > depthNode.key)
 				return 1 + findDepth(focusNode.leftChild, depthNode);
 		}
-		
+
 		return 0;
 	}
 
 	public void addLevel(Node focusNode, int level) {
 		if (focusNode != null) {
-			
+
 			if (findDepth(root, focusNode) == level) {
 				tempList.add(focusNode);
 			}
@@ -372,52 +384,68 @@ public class BinaryTree {
 			addLevel(focusNode.rightChild, level);
 		}
 	}
-	
+
 	public void levelOrderTraverseTree() {
-		
+
 		for (int i = 0; i < findHeight(root); i++) {
 			addLevel(root, i);
 			levelList.add(new ArrayList<Node>(tempList));
-			tempList.clear();
 		}
-		
+		tempList.clear();
+
 	}
 	
+	public ArrayList<Node> getLevel(Node focusNode, int level, ArrayList<Node> list) {
+		if (focusNode != null) {
+			
+			if (findDepth(root, focusNode) == level) {
+				list.add(focusNode);
+			}
+			
+			getLevel(focusNode.leftChild, level, list);
+			getLevel(focusNode.rightChild, level, list);
+			
+			return list;
+			
+		}
+		return null;
+		
+	}
+
 	public ArrayList<ArrayList<Node>> getList() {
 		return levelList;
 	}
-	
-	public void reverseInOrder(Node focusNode)
-	{
+
+	public void reverseInOrder(Node focusNode) {
 		reverseInOrder(focusNode.rightChild);
-		
+
 		System.out.println(focusNode.toString());
-		
+
 		reverseInOrder(focusNode.leftChild);
 	}
-	
+
 	public Node deleteMin(Node focusNode) {
 		if (focusNode.leftChild == null)
-			return focusNode.rightChild;  
+			return focusNode.rightChild;
 		focusNode.leftChild = deleteMin(focusNode.leftChild);
 		return focusNode;
 	}
-	
+
 	public Node getMin(Node focusNode) {
 		if (focusNode.leftChild == null)
 			return focusNode;
 		return getMin(focusNode.leftChild);
 	}
-	
+
 	public Node deleteNode(int key) {
-		
+
 		Node parentKey = findParent(key);
-		
+
 		Node savedNode = null;
-		
+
 		Node tempLeft = null;
 		Node tempRight = null;
-		
+
 		if (parentKey == null && isRoot == true) {
 			isRoot = false;
 			Node rootTemp = root;
@@ -429,7 +457,7 @@ public class BinaryTree {
 				rootTemp.leftChild = null;
 				rootTemp.rightChild = null;
 				return rootTemp;
-			} else if (root.leftChild != null){
+			} else if (root.leftChild != null) {
 				root = root.leftChild;
 				rootTemp.leftChild = null;
 				rootTemp.rightChild = null;
@@ -440,10 +468,10 @@ public class BinaryTree {
 				rootTemp.rightChild = null;
 				return rootTemp;
 			}
-			
+
 		} else {
 			System.out.println("parentkey = " + parentKey.toString());
-			
+
 			if (parentKey.leftChild != null && parentKey.leftChild.key == key) {
 				if (parentKey.leftChild.leftChild != null)
 					tempLeft = parentKey.leftChild.leftChild;
@@ -452,120 +480,55 @@ public class BinaryTree {
 				savedNode = parentKey.leftChild;
 				parentKey.leftChild = null;
 				System.out.println("parentkey.leftchild = " + parentKey.leftChild);
-			}
-			else if (parentKey.rightChild != null && parentKey.rightChild.key == key) {
+			} else if (parentKey.rightChild != null && parentKey.rightChild.key == key) {
 				if (parentKey.rightChild.leftChild != null)
 					tempLeft = parentKey.rightChild.leftChild;
 				if (parentKey.rightChild.rightChild != null)
 					tempRight = parentKey.rightChild.rightChild;
 				savedNode = parentKey.rightChild;
 				parentKey.rightChild = null;
-			}
-			else {
+			} else {
 				System.out.println("error");
 				return null;
 			}
-			
+
 			if (tempLeft != null)
 				addNode(tempLeft);
 			if (tempRight != null)
 				addNode(tempRight);
-			
+
 			return savedNode;
 		}
-	
+
 	}
-	
-	public void rearrangeTree()
-	{
+
+	public void rearrangeTree() {
 		Queue<Node> q = new LinkedList<Node>();
 		while (getHighestKey(root) != null) {
 			q.add(deleteNode(getHighestKey(root).key));
 		}
-		
+
 		int qSize = q.size();
-		
+
 		System.out.println("queue: " + q);
 		System.out.println("tree:");
 		preOrderTraverseTree(root);
-		
+
 		for (int i = 0; i < qSize; i++) {
 			addNode(q.remove());
 			System.out.println("queue: " + q);
 			preOrderTraverseTree(root);
 		}
 	}
-	
+
 	public Node getHighestKey(Node focusNode) {
 		if (focusNode == null)
 			return null;
 		while (focusNode.rightChild != null) {
 			focusNode = focusNode.rightChild;
 		}
-		
+
 		return focusNode;
 	}
 
-	public BinaryTree() {
-		/*
-		addNode(50, "Boss");
-		addNode(25, "Vice President");
-		addNode(15, "Office Manager");
-		addNode(30, "Secretary");
-		addNode(75, "Sales Manager");
-		addNode(85, "Salesman 1");
-		//theTree.addNode(76, "Cool Dude");
-
-		// Different ways to traverse binary trees
-
-		// theTree.inOrderTraverseTree(theTree.root);
-
-		// System.out.println("\n\n");
-
-		// theTree.preOrderTraverseTree(theTree.root);
-
-		// System.out.println("\n\n");
-
-		// theTree.postOrderTraverseTree(theTree.root);
-
-		/// System.out.println("\n\n");
-
-		// Find the node with key 75
-
-		// System.out.println("\nNode with the key 75");
-
-		// System.out.println(theTree.findNode(75));
-
-		//System.out.println("\nHeight of tree: " +
-		//theTree.findHeight(theTree.root));
-
-		//System.out.println("number of leaves: " + theTree.leafCount(theTree.root));
-		
-		//System.out.println("number of nodes with key <= 30: " + theTree.smallCount(theTree.root, 30));
-		
-		//theTree.levelOrderTraverseTree();
-		
-		//System.out.println(theTree.getHighestKey(theTree.root).toString());
-		
-		//theTree.preOrderTraverseTree(theTree.root);
-		
-		//theTree.deleteNode(25);
-		
-		//theTree.deleteNode(85);
-		
-		preOrderTraverseTree(root);
-		
-		System.out.println("rearranging...");
-		
-		rearrangeTree();
-		
-		System.out.println("rearranging complete");
-		
-		levelOrderTraverseTree();
-		
-		*/
-
-		
-	}
 }
-
