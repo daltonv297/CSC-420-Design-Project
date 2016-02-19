@@ -10,20 +10,14 @@ public class Node {
 	Node parent;
 	Node leftChild;
 	Node rightChild;
-	boolean isLeaf;
+	//boolean isLeaf;
 
-	public Node(Node parent, Color color, int key) {
+	public Node(Node parent, int key) {
 		this.parent = parent;
-		this.color = color;
 		this.key = key;
+		color = null;
 		coord = null;
 		//this.name = name;
-	}
-	
-	public Node(Node parent, Color color) {
-		this.parent = parent;
-		this.color = color;
-		coord = null;
 	}
 
 	

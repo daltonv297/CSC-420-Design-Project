@@ -70,9 +70,9 @@ public class Game extends Canvas implements Runnable {
 		
 		tree = new BinaryTree();
 		
-		tree.addNode(new Node(null, Color.BLUE, 50));
-		tree.addNode(new Node(null, Color.GREEN, 25));
-		tree.addNode(new Node(null, Color.YELLOW, 75));
+		//tree.addNode(new Node(null, Color.BLUE, 50));
+		//tree.addNode(new Node(null, Color.GREEN, 25));
+		//tree.addNode(new Node(null, Color.YELLOW, 75));
 	}
 	
 	public synchronized void start() {
@@ -165,15 +165,14 @@ public class Game extends Canvas implements Runnable {
 		drawTree(g);
 		
 		
-		
 		g.dispose();
 		bs.show();
 	}
 	
 	public void drawTree(Graphics2D g) {
-		if (tree.getRoot() != null) {
+		//if (tree.getRoot() != null) {
 			
-		}
+		//}
 	}
 	
 	public Point getMiddle(int widthOfShape, int heightOfShape) {

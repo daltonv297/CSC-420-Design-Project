@@ -4,18 +4,116 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
+import java.util.Stack;
 
 public class BinaryTree {
 
 	private Node root;
 	private boolean isRoot = false;
 
-	private ArrayList<ArrayList<Node>> levelList = new ArrayList<ArrayList<Node>>();
-	private ArrayList<Node> tempList = new ArrayList<Node>();
-
 	public BinaryTree() {
-
+		
+		//root = new Node(null, Color.ORANGE, 50);
+		//root.leftChild = new Node(root, Color.BLUE, 25);
+		//root.rightChild = new Node(root, Color.YELLOW, 75);
+		//root.leftChild.rightChild = new Node(root.leftChild, Color.RED, 15);
+		
+		generateTree(3);
+		
 	}
+
+	public ArrayList<ArrayList<Node>> levelOrder(Node root) {
+	    ArrayList<ArrayList<Node>> listOfLevels = new ArrayList<ArrayList<Node>>();
+	    ArrayList<Node> nodes = new ArrayList<Node>();
+	    if(root == null)
+	        return listOfLevels;
+	 
+	    LinkedList<Node> current = new LinkedList<Node>();
+	    LinkedList<Node> next = new LinkedList<Node>();
+	    current.add(root);
+	 
+	    while(!current.isEmpty()){
+	        Node node = current.remove();
+	 
+	        if(node.leftChild != null)
+	            next.add(node.leftChild);
+	        if(node.rightChild != null)
+	            next.add(node.rightChild);
+	 
+	        nodes.add(node);
+	        if(current.isEmpty()){
+	            current = next;
+	            next = new LinkedList<Node>();
+	            listOfLevels.add(nodes);
+	            nodes = new ArrayList<Node>();
+	        }
+	 
+	    }
+	    return listOfLevels;
+	}
+	
+	public void addNodeByParent(Node addThis, Node parent, boolean isLeftChild) {
+		
+	}
+	
+	public void generateTree(int height) {
+		Random rand = new Random();
+		
+		Queue<Integer> q = new LinkedList<Integer>();
+		Stack<Integer> s = new Stack<Integer>();
+		
+		int refInt = 0;
+		int tempInt = 0;
+		boolean addToStack = true;
+		
+		int numberOfNodes = 0;
+		
+		while (height >= 0) {
+			numberOfNodes += Math.pow(2, height--);
+		}
+		
+		for (int i = numberOfNodes - 1; i >= 0; i--) {
+			q.add(i);
+		}
+		
+		if (!q.isEmpty()) {
+			s.add(q.remove());
+		} else {
+			System.out.println("q is empty");
+		}
+		
+		if (!q.isEmpty()) {
+			refInt = tempInt = q.remove();
+			q.add(tempInt);
+		} else {
+			System.out.println("q is empty");
+		}
+		
+		
+		while (!q.isEmpty())  {
+			
+			if (addToStack) {
+				s.add(q.remove());
+				addToStack = false;
+			}
+			else {
+				if (q.peek() != refInt) {
+					tempInt = q.remove();
+					q.add(tempInt);
+					addToStack = true;
+				} else {
+					s.add(q.remove());
+					refInt = q.peek();
+					addToStack = true;	//just changed
+				}
+			}
+				
+			
+		}
+	}
+	
+	/*
 
 	public void addNode(Color color, int key) {
 
@@ -530,5 +628,6 @@ public class BinaryTree {
 
 		return focusNode;
 	}
+	*/
 
 }
