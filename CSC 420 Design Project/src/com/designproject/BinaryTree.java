@@ -1,6 +1,5 @@
 package com.designproject;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -10,20 +9,15 @@ import java.util.Stack;
 public class BinaryTree {
 
 	private Node root;
-	private boolean isRoot = false;
 
 	public BinaryTree() {
 		
-		//root = new Node(null, Color.ORANGE, 50);
-		//root.leftChild = new Node(root, Color.BLUE, 25);
-		//root.rightChild = new Node(root, Color.YELLOW, 75);
-		//root.leftChild.rightChild = new Node(root.leftChild, Color.RED, 15);
-		
 		generateTree(3);
+		printLevelOrder();
 		
 	}
 
-	public ArrayList<ArrayList<Node>> levelOrder(Node root) {
+	public ArrayList<ArrayList<Node>> getLevelOrder(Node root) {
 	    ArrayList<ArrayList<Node>> listOfLevels = new ArrayList<ArrayList<Node>>();
 	    ArrayList<Node> nodes = new ArrayList<Node>();
 	    if(root == null)
@@ -53,19 +47,15 @@ public class BinaryTree {
 	    return listOfLevels;
 	}
 	
-	public void addNodeByParent(Node addThis, Node parent, boolean isLeftChild) {
-		
-	}
-	
 	public void generateTree(int height) {
-		Random rand = new Random();
 		
 		Queue<Integer> q = new LinkedList<Integer>();
 		Stack<Integer> s = new Stack<Integer>();
 		
-		int refInt = 0;
+		int refInt;
 		int tempInt = 0;
 		boolean addToStack = true;
+		boolean skipRef = true;
 		
 		int numberOfNodes = 0;
 		
@@ -77,51 +67,38 @@ public class BinaryTree {
 			q.add(i);
 		}
 		
-		if (!q.isEmpty()) {
-			s.add(q.remove());
-		} else {
-			System.out.println("q is empty");
-		}
-		
-		if (!q.isEmpty()) {
-			refInt = tempInt = q.remove();
-			q.add(tempInt);
-		} else {
-			System.out.println("q is empty");
-		}
-		
+		refInt = numberOfNodes - 2;
 		
 		while (!q.isEmpty())  {
 			
 			if (addToStack) {
-				s.add(q.remove());
+				s.push(q.remove());
 				addToStack = false;
 			}
 			else {
-				if (q.peek() != refInt) {
+				if (q.peek() != refInt || skipRef) {
 					tempInt = q.remove();
 					q.add(tempInt);
 					addToStack = true;
+					skipRef = false;
 				} else {
-					s.add(q.remove());
-					refInt = q.peek();
-					addToStack = true;	//just changed
+					s.push(q.remove());
+					if (!q.isEmpty())
+						refInt = q.peek();
+					addToStack = false;
+					skipRef = true;
 				}
 			}
-				
-			
+		}
+		int stackSize = s.size();
+		for (int i = 0; i < stackSize; i++) {
+			addNode(i, s.pop());
 		}
 	}
-	
-	/*
 
-	public void addNode(Color color, int key) {
+	public void addNode(int value, int key) {
 
-		// Create a new Node and initialize it
-
-		Node newNode = new Node(null, color, key);
-
-		// If there is no root this becomes root
+		Node newNode = new Node(null, value, key);
 
 		if (root == null) {
 
@@ -129,65 +106,63 @@ public class BinaryTree {
 
 		} else {
 
-			// Set root as the Node we will start
-			// with as we traverse the tree
-
 			Node focusNode = root;
-
-			// Future parent for our new Node
 
 			Node parent;
 
 			while (true) {
 
-				// root is the top parent so we start
-				// there
-
 				parent = focusNode;
-
-				// Check if the new node should go on
-				// the left side of the parent node
 
 				if (key < focusNode.key) {
 
-					// Switch focus to the left child
-
 					focusNode = focusNode.leftChild;
 
-					// If the left child has no children
-
 					if (focusNode == null) {
-
-						// then place the new node on the left of it
 
 						parent.leftChild = newNode;
 						newNode.parent = parent;
-						return; // All Done
+						return;
 
 					}
 
-				} else { // If we get here put the node on the right
+				} else {
 
 					focusNode = focusNode.rightChild;
 
-					// If the right child has no children
-
 					if (focusNode == null) {
-
-						// then place the new node on the right of it
 
 						parent.rightChild = newNode;
 						newNode.parent = parent;
-						return; // All Done
+						return;
 
 					}
-
 				}
-
 			}
 		}
-
 	}
+	
+	public void preOrderTraversal(Node focusNode) {
+
+		if (focusNode != null) {
+			System.out.println(focusNode);
+
+			preOrderTraversal(focusNode.leftChild);
+
+			preOrderTraversal(focusNode.rightChild);
+		}
+	}
+	
+	public void printLevelOrder() {
+		ArrayList<ArrayList<Node>> list = getLevelOrder(root);
+		for (int i = 0; i < list.size(); i++) {
+			for (int j = 0; j < list.get(i).size(); j++) {
+				System.out.println(list.get(i).get(j));
+			}
+		}
+	}
+	
+	/*
 
 	public void addNode(Node addThis) {
 
@@ -292,17 +267,6 @@ public class BinaryTree {
 
 		}
 
-	}
-
-	public void preOrderTraverseTree(Node focusNode) {
-
-		if (focusNode != null) {
-			System.out.println(focusNode);
-
-			preOrderTraverseTree(focusNode.leftChild);
-
-			preOrderTraverseTree(focusNode.rightChild);
-		}
 	}
 
 	public void postOrderTraverseTree(Node focusNode) {
