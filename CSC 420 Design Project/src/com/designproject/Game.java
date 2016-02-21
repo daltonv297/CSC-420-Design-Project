@@ -3,6 +3,7 @@ package com.designproject;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -18,6 +19,9 @@ public class Game extends Canvas implements Runnable {
 	private JFrame frame;
 	
 	private BinaryTree tree;
+	private ArrayList<Node> leaves;
+	
+	private Pointer pointer;
 	
 	public boolean running = false;
 	public int tickCount = 0;
@@ -54,25 +58,10 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	public void init() {
-		/*
-		try {
-			testimg = ImageIO.read(getClass().getResource("/testimg.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		*/
-		
-		//xPos = getWidth() / 2 - testimg.getWidth() / 4;
-		//yPos = getHeight() / 2 - testimg.getHeight() / 4;
-		
 		
 		input = new Input(this);
-		
-		tree = new BinaryTree();
-		
-		//tree.addNode(new Node(null, Color.BLUE, 50));
-		//tree.addNode(new Node(null, Color.GREEN, 25));
-		//tree.addNode(new Node(null, Color.YELLOW, 75));
+		tree = new BinaryTree(3);
+		pointer = new Pointer(tree.getLeaf(0), 0);
 	}
 	
 	public synchronized void start() {
@@ -83,6 +72,7 @@ public class Game extends Canvas implements Runnable {
 	public synchronized void stop() {
 		running = false;
 	}
+	
 	
 	/* 
 	 * The following method allows for separation of game updates (ticks) and the amount of frames rendered.
@@ -138,16 +128,28 @@ public class Game extends Canvas implements Runnable {
 		tickCount++;
 		
 		if (input.up.isPressed()) {
-			yPos -= 5;
+			tree.shiftUp(pointer.getNode());
+			input.up.setReleased();
 		}
 		if (input.down.isPressed()) {
-			yPos += 5;
+			tree.shiftDown(pointer.getNode());
+			input.down.setReleased();
 		}
 		if (input.left.isPressed()) {
-			xPos -= 5;
+			if (pointer.getIndex() == 0)
+				pointer.setNode(tree.getLeaf(tree.getLeaves().size() - 1), tree.getLeaves().size() - 1);
+			else
+				pointer.setNode(tree.getLeaf(pointer.getIndex() - 1), pointer.getIndex() - 1);
+			System.out.println(pointer.getNode());
+			input.left.setReleased();
 		}
 		if (input.right.isPressed()) {
-			xPos += 5;
+			if (pointer.getIndex() == tree.getLeaves().size() - 1)
+				pointer.setNode(tree.getLeaf(0), 0);
+			else
+				pointer.setNode(tree.getLeaf(pointer.getIndex() + 1), pointer.getIndex() + 1);
+			System.out.println(pointer.getNode());
+			input.right.setReleased();
 		}
 	}
 	

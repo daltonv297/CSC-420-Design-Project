@@ -12,21 +12,18 @@ public class Input implements KeyListener {
 	}
 	
 	public class Key {
-		private int numTimesPressed = 0;
 		private boolean isPressed = false;
 		
 		public boolean isPressed() {
 			return isPressed;
 		}
 		
-		public int getNumTimesPressed() {
-			return numTimesPressed;
+		public void setPressed() {
+			isPressed = true;
 		}
 		
-		public void toggle(boolean isPressed) {
-			this.isPressed = isPressed;
-			if (this.isPressed)
-				numTimesPressed++;
+		public void setReleased() {
+			isPressed = false;
 		}
 	}
 	
@@ -37,29 +34,29 @@ public class Input implements KeyListener {
 	public Key right = new Key();
 
 	public void keyPressed(KeyEvent e) {
-		toggleKey(e.getKeyCode(), true);
+		toggleKey(e.getKeyCode());
 	}
 
 	public void keyReleased(KeyEvent e) {
-		toggleKey(e.getKeyCode(), false);
+		//toggleKey(e.getKeyCode(), false);
 	}
 
 	public void keyTyped(KeyEvent e) {
 
 	}
 	
-	public void toggleKey(int keyCode, boolean isPressed) {
+	public void toggleKey(int keyCode) {
 		if (keyCode == KeyEvent.VK_UP) {
-			up.toggle(isPressed);
+			up.setPressed();
 		}
 		if (keyCode == KeyEvent.VK_DOWN) {
-			down.toggle(isPressed);
+			down.setPressed();
 		}
 		if (keyCode == KeyEvent.VK_LEFT) {
-			left.toggle(isPressed);
+			left.setPressed();
 		}
 		if (keyCode == KeyEvent.VK_RIGHT) {
-			right.toggle(isPressed);
+			right.setPressed();
 		}
 	}
 

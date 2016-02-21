@@ -1,6 +1,7 @@
 package com.designproject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
@@ -9,12 +10,11 @@ import java.util.Stack;
 public class BinaryTree {
 
 	private Node root;
+	private ArrayList<Node> leaves = new ArrayList<Node>();
 
-	public BinaryTree() {
-		
-		generateTree(3);
-		printLevelOrder();
-		
+	public BinaryTree(int height) {
+		generateTree(height);
+		shiftDown(leaves.get(0));
 	}
 
 	public ArrayList<ArrayList<Node>> getLevelOrder(Node root) {
@@ -94,6 +94,8 @@ public class BinaryTree {
 		for (int i = 0; i < stackSize; i++) {
 			addNode(i, s.pop());
 		}
+		
+		setLeaves(root);
 	}
 
 	public void addNode(int value, int key) {
@@ -142,6 +144,24 @@ public class BinaryTree {
 		}
 	}
 	
+	public void setLeaves(Node focusNode) {
+		if (focusNode != null) {
+			if (focusNode.leftChild == null && focusNode.rightChild == null)
+				leaves.add(focusNode);
+			
+			setLeaves(focusNode.leftChild);
+			setLeaves(focusNode.rightChild);
+		}
+	}
+	
+	public ArrayList<Node> getLeaves() {
+		return leaves;
+	}
+	
+	public Node getLeaf(int index) {
+		return leaves.get(index);
+	}
+	
 	public void preOrderTraversal(Node focusNode) {
 
 		if (focusNode != null) {
@@ -160,6 +180,66 @@ public class BinaryTree {
 				System.out.println(list.get(i).get(j));
 			}
 		}
+	}
+	
+	public void shiftUp(Node leaf) {
+		Node focusNode = leaf;
+		while (focusNode != null) {
+			focusNode.tempValue = focusNode.value;
+			focusNode = focusNode.parent;
+		}
+		
+		focusNode = leaf;
+		while (focusNode != root) {
+			focusNode.parent.value = focusNode.tempValue;
+			focusNode = focusNode.parent;
+		}
+		leaf.value = focusNode.tempValue;
+	}
+	
+	public void shiftDown(Node leaf) {
+		ArrayList<Node> list = new ArrayList<Node>(getPath(leaf));
+		
+		for (int i = 0; i < list.size(); i++) {
+			list.get(i).tempValue = list.get(i).value;
+		}
+		
+		for (int i = 0; i < list.size() - 1; i++) {
+			list.get(i + 1).value = list.get(i).tempValue;
+		}
+		
+		list.get(0).value = list.get(list.size() - 1).tempValue;
+	}
+	
+	public ArrayList<Node> getPath(Node pathNode) {
+		if (pathNode == null)
+			return null;
+		
+		Stack<Node> s = new Stack<Node>();
+		s.push(root);
+		
+		while (!s.isEmpty() && s.peek() != pathNode) {
+			
+			if (s.peek().leftChild != null && !s.peek().leftChild.visited) {
+				s.push(s.peek().leftChild);
+				s.peek().visited = true;
+			}
+			else if (s.peek().rightChild != null && !s.peek().rightChild.visited) {
+				s.push(s.peek().rightChild);
+				s.peek().visited = true;
+			}
+			else {
+				s.pop();
+			}
+		}
+		
+		ArrayList<Node> list = new ArrayList<Node>(s);
+		
+		for (int i = 0; i < list.size(); i++)
+			list.get(i).visited = false;
+		
+		return list;
+		
 	}
 	
 	/*
