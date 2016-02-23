@@ -10,14 +10,26 @@ import java.util.Stack;
 public class BinaryTree {
 
 	private Node root;
+	private int height;
+	private int windowHeight;
+	private int windowWidth;
+	private int nodeSize;
 	private ArrayList<Node> leaves = new ArrayList<Node>();
+	private ArrayList<Move> moves = new ArrayList<Move>();
 
-	public BinaryTree(int height) {
+	public BinaryTree(int height, int wWidth, int wHeight, int nodeSize) {
+		this.height = height;
+		this.nodeSize = nodeSize;
+		windowHeight = wHeight;
+		windowWidth = wWidth;
 		generateTree(height);
-		shiftDown(leaves.get(0));
+	}
+	
+	public Node getRoot() {
+		return root;
 	}
 
-	public ArrayList<ArrayList<Node>> getLevelOrder(Node root) {
+	public ArrayList<ArrayList<Node>> getLevelOrder() {
 	    ArrayList<ArrayList<Node>> listOfLevels = new ArrayList<ArrayList<Node>>();
 	    ArrayList<Node> nodes = new ArrayList<Node>();
 	    if(root == null)
@@ -45,6 +57,36 @@ public class BinaryTree {
 	 
 	    }
 	    return listOfLevels;
+	}
+	
+	public ArrayList<Node> getLevel(int level) {
+	    ArrayList<ArrayList<Node>> listOfLevels = new ArrayList<ArrayList<Node>>();
+	    ArrayList<Node> nodes = new ArrayList<Node>();
+	    if(root == null)
+	        return null;
+	 
+	    LinkedList<Node> current = new LinkedList<Node>();
+	    LinkedList<Node> next = new LinkedList<Node>();
+	    current.add(root);
+	 
+	    while(!current.isEmpty()){
+	        Node node = current.remove();
+	 
+	        if(node.leftChild != null)
+	            next.add(node.leftChild);
+	        if(node.rightChild != null)
+	            next.add(node.rightChild);
+	 
+	        nodes.add(node);
+	        if(current.isEmpty()){
+	            current = next;
+	            next = new LinkedList<Node>();
+	            listOfLevels.add(nodes);
+	            nodes = new ArrayList<Node>();
+	        }
+	 
+	    }
+	    return listOfLevels.get(level);
 	}
 	
 	public void generateTree(int height) {
@@ -97,52 +139,75 @@ public class BinaryTree {
 		
 		setLeaves(root);
 	}
+	
+	public void setNodeLocations(int xMargin, int yMargin) {
+		ArrayList<ArrayList<Node>> list = new ArrayList<ArrayList<Node>>();
+		
+		int minHorizontalSpace = (windowWidth - xMargin * 2) / list.get(list.size() - 1).size();
+		
+		int verticalSpace = (windowHeight - yMargin * 2) / height + 1;
+		
+		for (int i = list.size() - 1; i >= 0; i++) {
+			
+		}
+		
+	}
 
 	public void addNode(int value, int key) {
+		 
 
-		Node newNode = new Node(null, value, key);
-
-		if (root == null) {
-
-			root = newNode;
-
-		} else {
-
-			Node focusNode = root;
-
-			Node parent;
-
-			while (true) {
-
-				parent = focusNode;
-
-				if (key < focusNode.key) {
-
-					focusNode = focusNode.leftChild;
-
-					if (focusNode == null) {
-
-						parent.leftChild = newNode;
-						newNode.parent = parent;
-						return;
-
-					}
-
-				} else {
-
-					focusNode = focusNode.rightChild;
-
-					if (focusNode == null) {
-
-						parent.rightChild = newNode;
-						newNode.parent = parent;
-						return;
-
-					}
-				}
-			}
-		}
-	}
+    	Node newNode = new Node(null, value, key);
+ 
+        if (root == null) {
+ 
+            root = newNode;
+            root.coord.setLocation((windowWidth/2)-20, 5);
+        } else {
+ 
+            Node focusNode = root;
+ 
+            Node parent;
+ 
+            while (true) {
+ 
+                parent = focusNode;
+ 
+                if (key < focusNode.key) {
+ 
+                    focusNode = focusNode.leftChild;
+ 
+                    if (focusNode == null) {
+ 
+                        parent.leftChild = newNode;
+                        int depth = findDepth(root, newNode);
+                        int depthP = (int) Math.pow(depth, 2);
+                        newNode.coord.setLocation(parent.coord.x - (windowWidth/(depthP+3)), parent.coord.y + 167);
+                        newNode.parent = parent;
+                        return;
+ 
+                    }
+ 
+                } else {
+ 
+                    focusNode = focusNode.rightChild;
+ 
+                    if (focusNode == null) {
+ 
+                        parent.rightChild = newNode;
+                        int depth = findDepth(root, newNode);
+                        int depthP = (int) Math.pow(depth, 2);
+                        newNode.coord.setLocation(parent.coord.x + (windowWidth/(depthP+3)), parent.coord.y + 167);
+                        newNode.parent = parent;
+                        return;
+ 
+                    }
+ 
+                }
+ 
+            }
+        }
+ 
+    }
 	
 	public void setLeaves(Node focusNode) {
 		if (focusNode != null) {
@@ -174,7 +239,7 @@ public class BinaryTree {
 	}
 	
 	public void printLevelOrder() {
-		ArrayList<ArrayList<Node>> list = getLevelOrder(root);
+		ArrayList<ArrayList<Node>> list = getLevelOrder();
 		for (int i = 0; i < list.size(); i++) {
 			for (int j = 0; j < list.get(i).size(); j++) {
 				System.out.println(list.get(i).get(j));
@@ -195,20 +260,30 @@ public class BinaryTree {
 			focusNode = focusNode.parent;
 		}
 		leaf.value = focusNode.tempValue;
+		
+		setLeaves(root);
 	}
 	
 	public void shiftDown(Node leaf) {
-		ArrayList<Node> list = new ArrayList<Node>(getPath(leaf));
 		
-		for (int i = 0; i < list.size(); i++) {
-			list.get(i).tempValue = list.get(i).value;
+		Node focusNode = leaf;
+		
+		while (focusNode != null) {
+			focusNode.tempValue = focusNode.value;
+			focusNode = focusNode.parent;
 		}
 		
-		for (int i = 0; i < list.size() - 1; i++) {
-			list.get(i + 1).value = list.get(i).tempValue;
+		focusNode = leaf;
+		
+		while (focusNode != root) {
+			focusNode.value = focusNode.parent.tempValue;
+			focusNode = focusNode.parent;
 		}
 		
-		list.get(0).value = list.get(list.size() - 1).tempValue;
+		focusNode.value = leaf.tempValue; 	//sets root value from selected leaf
+		
+		setLeaves(root);
+		
 	}
 	
 	public ArrayList<Node> getPath(Node pathNode) {
@@ -241,6 +316,43 @@ public class BinaryTree {
 		return list;
 		
 	}
+	
+	public void randomizeTree(int amount) {
+		Random rand = new Random();
+		int index;
+		
+		for (int i = 0; i < amount; i++) {
+			index = rand.nextInt(leaves.size());
+			for (int j = 0; j < rand.nextInt(height) + 1; j++) {
+				shiftUp(leaves.get(index));
+				moves.add(new Move("up", index));
+			}
+		}
+	}
+	
+	public void addMove(String move, int index) {
+		moves.add(new Move(move, index));
+	}
+	
+	public ArrayList<Move> getMoves() {
+		return moves;
+	}
+	
+	public int findDepth(Node focusNode, Node depthNode) {
+		if (depthNode == null)
+			return -1;
+		if (focusNode != null && focusNode != depthNode) {
+
+			if (focusNode.key < depthNode.key)
+				return 1 + findDepth(focusNode.rightChild, depthNode);
+			else if (focusNode.key > depthNode.key)
+				return 1 + findDepth(focusNode.leftChild, depthNode);
+		}
+
+		return 0;
+	}
+	
+	
 	
 	/*
 

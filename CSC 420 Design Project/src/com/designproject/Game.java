@@ -26,8 +26,7 @@ public class Game extends Canvas implements Runnable {
 	public boolean running = false;
 	public int tickCount = 0;
 	
-	int xPos = 0;
-	int yPos = 0;
+	int nodeSize = 40;
 	
 	//private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	//private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();	//gets pixel array from raster image
@@ -60,7 +59,7 @@ public class Game extends Canvas implements Runnable {
 	public void init() {
 		
 		input = new Input(this);
-		tree = new BinaryTree(3);
+		tree = new BinaryTree(3, WIDTH, HEIGHT, nodeSize);
 		pointer = new Pointer(tree.getLeaf(0), 0);
 	}
 	
@@ -129,10 +128,12 @@ public class Game extends Canvas implements Runnable {
 		
 		if (input.up.isPressed()) {
 			tree.shiftUp(pointer.getNode());
+			tree.addMove("up", pointer.getIndex());
 			input.up.setReleased();
 		}
 		if (input.down.isPressed()) {
 			tree.shiftDown(pointer.getNode());
+			tree.addMove("down", pointer.getIndex());
 			input.down.setReleased();
 		}
 		if (input.left.isPressed()) {
@@ -160,38 +161,40 @@ public class Game extends Canvas implements Runnable {
 			createBufferStrategy(2);				//create a double-buffering strategy (change to 3 if tearing occurs)
 			return;
 		}
-		setBackground(Color.RED);
+		setBackground(Color.GRAY);
 		Graphics2D g = (Graphics2D) bs.getDrawGraphics();			//gets our graphics context for drawing to the Canvas
 		paint(g);
 		
-		drawTree(g);
+		
+		drawTree(g, tree.getRoot());
 		
 		
 		g.dispose();
 		bs.show();
 	}
 	
-	public void drawTree(Graphics2D g) {
-		//if (tree.getRoot() != null) {
-			
-		//}
+	public void drawTree(Graphics2D g, Node focusNode) {
+		if (focusNode != null) {
+			g.setColor(Color.YELLOW);
+			g.fillOval(focusNode.coord.x, focusNode.coord.y, nodeSize, nodeSize);
+			g.setColor(Color.BLACK);
+			if (focusNode.leftChild!=null){
+				g.drawLine(focusNode.coord.x + nodeSize / 2, focusNode.coord.y + nodeSize, focusNode.leftChild.coord.x + nodeSize / 2, focusNode.leftChild.coord.y);
+			}
+			if(focusNode.rightChild!=null){
+				g.drawLine(focusNode.coord.x + nodeSize / 2, focusNode.coord.y + nodeSize , focusNode.rightChild.coord.x + nodeSize / 2, focusNode.rightChild.coord.y);
+			}
+
+			drawTree(g, focusNode.leftChild);
+			drawTree(g, focusNode.rightChild);
+		}
 	}
+
+	
 	
 	public Point getMiddle(int widthOfShape, int heightOfShape) {
 		return new Point(getWidth() / 2 - widthOfShape / 2, getHeight() / 2 - heightOfShape / 2);
 	}
-	
-	/*
-	public void fillOvalInMiddle(Graphics2D g, Shape s, int xOffset, int yOffset) {
-		s.getBounds().setLocation(new Point((int) (getWidth() / 2 - s.getBounds().getWidth()), 
-				(int) (getHeight() / 2 - s.getBounds().getHeight())));
-		//s.getBounds().setBounds(new Rectangle((int) (getWidth() / 2 - s.getBounds().getWidth()), 
-			//	(int) (getHeight() / 2 - s.getBounds().getHeight())));
-		System.out.println(s.getBounds2D().getBounds());
-		
-		g.fill(s);
-	}
-	*/
 	
 	public static void main(String[] args) {
 		new Game().start();

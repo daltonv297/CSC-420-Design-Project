@@ -17,7 +17,7 @@ public class Node {
 		this.key = key;
 		this.value = value;
 		tempValue = value;
-		coord = null;
+		coord = new Point();
 	}
 
 	public String toString() {
