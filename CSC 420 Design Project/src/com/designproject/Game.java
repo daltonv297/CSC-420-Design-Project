@@ -17,6 +17,7 @@ public class Game extends Canvas implements Runnable {
 	public static final String NAME = "TreeFiddy";
 	
 	private JFrame frame;
+	private Menu menu;
 	
 	private BinaryTree tree;
 	private ArrayList<Node> leaves;
@@ -27,6 +28,13 @@ public class Game extends Canvas implements Runnable {
 	public int tickCount = 0;
 	
 	int nodeSize = 40;
+	
+	private enum STATE {
+		MENU,
+		GAME
+	};
+	
+	private STATE state = STATE.MENU;
 	
 	//private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	//private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();	//gets pixel array from raster image
@@ -41,11 +49,14 @@ public class Game extends Canvas implements Runnable {
 		setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		
 		frame = new JFrame(NAME);
+		menu = new Menu();
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		
+		
 		frame.add(this, BorderLayout.CENTER);
+		
 		frame.pack();
 		
 		frame.setResizable(false);
@@ -57,6 +68,8 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	public void init() {
+		
+		
 		
 		input = new Input(this);
 		tree = new BinaryTree(3, WIDTH, HEIGHT, nodeSize);
@@ -124,8 +137,15 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	public void tick() {
-		tickCount++;
 		
+		if (state == STATE.GAME) {
+			tickCount++;
+			pollInputs();
+		}
+		
+	}
+	
+	public void pollInputs() {
 		if (input.up.isPressed()) {
 			tree.shiftUp(pointer.getNode());
 			tree.addMove("up", pointer.getIndex());
@@ -162,12 +182,16 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 		setBackground(Color.GRAY);
-		Graphics2D g = (Graphics2D) bs.getDrawGraphics();			//gets our graphics context for drawing to the Canvas
+		Graphics2D g = (Graphics2D) bs.getDrawGraphics();	//gets our graphics context for drawing to the Canvas
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		paint(g);
 		
-		
-		drawTree(g, tree.getRoot());
-		
+		if (state == STATE.GAME) {
+			drawTree(g, tree.getRoot());
+		} else if (state == STATE.MENU) {
+			menu.render(g);
+		}
 		
 		g.dispose();
 		bs.show();
