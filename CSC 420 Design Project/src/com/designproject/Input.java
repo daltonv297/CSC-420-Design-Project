@@ -2,13 +2,18 @@ package com.designproject;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Input implements KeyListener {
+import com.designproject.Game.STATE;
+
+public class Input implements KeyListener, MouseListener {
 	
 	public Input(Game game) {
 		game.addKeyListener(this);
+		game.addMouseListener(this);
 	}
 	
 	public class Key {
@@ -42,6 +47,41 @@ public class Input implements KeyListener {
 	}
 
 	public void keyTyped(KeyEvent e) {
+
+	}
+	
+	public void mouseClicked(MouseEvent e) {
+		
+		if (Game.menu.b1.contains(e.getPoint())) {
+			Game.state = STATE.GAME;
+		}
+		
+		if (Game.menu.b2.contains(e.getPoint())) {
+			if (Game.menu.getHeight() > 4) {
+				Game.menu.setHeight(2);
+			} else {
+				Game.menu.setHeight(Game.menu.getHeight() + 1);
+			}
+		}
+		
+		if (Game.menu.b3.contains(e.getPoint())) {
+			System.exit(1);
+		}
+	}
+
+	public void mouseEntered(MouseEvent e) {
+
+	}
+
+	public void mouseExited(MouseEvent e) {
+
+	}
+
+	public void mousePressed(MouseEvent e) {
+
+	}
+
+	public void mouseReleased(MouseEvent e) {
 
 	}
 	

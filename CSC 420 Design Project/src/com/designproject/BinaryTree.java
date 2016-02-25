@@ -138,22 +138,86 @@ public class BinaryTree {
 		}
 		
 		setLeaves(root);
+		
+		if(leaves.size() > 30)
+			setNodeLocations(50, 50);
+		else
+			setNodeLocations(100, 100);
 	}
 	
 	public void setNodeLocations(int xMargin, int yMargin) {
-		ArrayList<ArrayList<Node>> list = new ArrayList<ArrayList<Node>>();
+		ArrayList<ArrayList<Node>> list = getLevelOrder();
 		
-		int minHorizontalSpace = (windowWidth - xMargin * 2) / list.get(list.size() - 1).size();
+		int minHorizontalSpace = (windowWidth - xMargin * 2) / (leaves.size() - 1);
 		
 		int verticalSpace = (windowHeight - yMargin * 2) / height + 1;
 		
-		for (int i = list.size() - 1; i >= 0; i++) {
-			
+		for (int i = 0; i < leaves.size(); i++) {
+			if (i == 0)
+				leaves.get(i).coord.setLocation(xMargin - nodeSize / 2, windowHeight - yMargin - nodeSize);
+			else
+				leaves.get(i).coord.setLocation(leaves.get(i - 1).coord.getX() + minHorizontalSpace, windowHeight - yMargin - nodeSize);
 		}
 		
+		for (int i = list.size() - 2; i >= 0; i--) {
+			
+			for (int j = 0; j < list.get(i).size(); j++) {
+				Node node = list.get(i).get(j);
+				node.coord.setLocation((node.leftChild.coord.getX() + node.rightChild.coord.getX()) / 2, 
+						node.leftChild.coord.getY() - verticalSpace);
+			}
+		}
+	}
+	
+	public void addNode(int value, int key) {
+		 
+
+    	Node newNode = new Node(null, value, key);
+ 
+        if (root == null) {
+ 
+            root = newNode;
+        } else {
+ 
+            Node focusNode = root;
+ 
+            Node parent;
+ 
+            while (true) {
+ 
+                parent = focusNode;
+ 
+                if (key < focusNode.key) {
+ 
+                    focusNode = focusNode.leftChild;
+ 
+                    if (focusNode == null) {
+ 
+                        parent.leftChild = newNode;
+                        newNode.parent = parent;
+                        return;
+ 
+                    }
+ 
+                } else {
+ 
+                    focusNode = focusNode.rightChild;
+ 
+                    if (focusNode == null) {
+ 
+                        parent.rightChild = newNode;
+                        newNode.parent = parent;
+                        return;
+ 
+                    }
+ 
+                }
+ 
+            }
+        }
 	}
 
-	public void addNode(int value, int key) {
+	public void addNodeAndCoords(int value, int key) {
 		 
 
     	Node newNode = new Node(null, value, key);

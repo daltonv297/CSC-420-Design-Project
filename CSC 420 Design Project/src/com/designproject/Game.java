@@ -3,8 +3,12 @@ package com.designproject;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 public class Game extends Canvas implements Runnable {
@@ -17,7 +21,7 @@ public class Game extends Canvas implements Runnable {
 	public static final String NAME = "TreeFiddy";
 	
 	private JFrame frame;
-	private Menu menu;
+	public static Menu menu;
 	
 	private BinaryTree tree;
 	private ArrayList<Node> leaves;
@@ -29,17 +33,17 @@ public class Game extends Canvas implements Runnable {
 	
 	int nodeSize = 40;
 	
-	private enum STATE {
+	public enum STATE {
 		MENU,
 		GAME
 	};
 	
-	private STATE state = STATE.MENU;
+	public static STATE state = STATE.MENU;
 	
 	//private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	//private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();	//gets pixel array from raster image
 	
-	//BufferedImage testimg = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+	Image pointerImg;
 	
 	public Input input;
 	
@@ -68,12 +72,12 @@ public class Game extends Canvas implements Runnable {
 	}
 	
 	public void init() {
-		
-		
-		
 		input = new Input(this);
-		tree = new BinaryTree(3, WIDTH, HEIGHT, nodeSize);
-		pointer = new Pointer(tree.getLeaf(0), 0);
+		try {
+			pointerImg = ImageIO.read(new File("res/pointer.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public synchronized void start() {
@@ -105,6 +109,7 @@ public class Game extends Canvas implements Runnable {
 		init();
 		
 		while (running) {
+			
 			long now = System.nanoTime();
 			delta += (now - lastTime) / nsPerTick;
 			lastTime = now;
@@ -139,6 +144,10 @@ public class Game extends Canvas implements Runnable {
 	public void tick() {
 		
 		if (state == STATE.GAME) {
+			if (tree == null)
+				tree = new BinaryTree(menu.getHeight(), getWidth(), getHeight(), nodeSize);
+			if (pointer == null)
+				pointer = new Pointer(tree.getLeaf(0), 0);
 			tickCount++;
 			pollInputs();
 		}
@@ -187,8 +196,12 @@ public class Game extends Canvas implements Runnable {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		paint(g);
 		
-		if (state == STATE.GAME) {
+		if (state == STATE.GAME && tree != null) {
 			drawTree(g, tree.getRoot());
+			int pointerX = (int) (pointer.getNode().coord.getX() + nodeSize / 2 - pointerImg.getWidth(this) / 2);
+			int pointerY = (int) (pointer.getNode().coord.getY() + 50);
+			g.drawImage(pointerImg, pointerX, pointerY, 
+					pointerImg.getWidth(this), pointerImg.getHeight(this), this);
 		} else if (state == STATE.MENU) {
 			menu.render(g);
 		}
@@ -202,6 +215,10 @@ public class Game extends Canvas implements Runnable {
 			g.setColor(Color.YELLOW);
 			g.fillOval(focusNode.coord.x, focusNode.coord.y, nodeSize, nodeSize);
 			g.setColor(Color.BLACK);
+			g.setFont(new Font("arial", Font.BOLD, 20));
+			String number = "" + focusNode.value;
+			g.drawString(number, (int) (focusNode.coord.getX() + nodeSize / 2 - getTextCenter(g, number).getX()), 
+					(int) (focusNode.coord.getY() + nodeSize / 2 + getTextCenter(g, number).getY()) - 4);
 			if (focusNode.leftChild!=null){
 				g.drawLine(focusNode.coord.x + nodeSize / 2, focusNode.coord.y + nodeSize, focusNode.leftChild.coord.x + nodeSize / 2, focusNode.leftChild.coord.y);
 			}
@@ -213,11 +230,20 @@ public class Game extends Canvas implements Runnable {
 			drawTree(g, focusNode.rightChild);
 		}
 	}
+	
+	public Point getTextCenter(Graphics2D g, String s) {
+		Rectangle2D rect = g.getFontMetrics().getStringBounds(s, g);
+		return new Point((int) (rect.getWidth() / 2), (int) (rect.getHeight() / 2));
+	}
 
 	
 	
 	public Point getMiddle(int widthOfShape, int heightOfShape) {
 		return new Point(getWidth() / 2 - widthOfShape / 2, getHeight() / 2 - heightOfShape / 2);
+	}
+	
+	public int getMiddle(int widthOfShape) {
+		return getWidth() / 2 - widthOfShape / 2;
 	}
 	
 	public static void main(String[] args) {

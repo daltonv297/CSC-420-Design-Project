@@ -21,6 +21,6 @@ public class Node {
 	}
 
 	public String toString() {
-		return "Node with value of " + value + " has the key " + key;
+		return "Node with value of " + value + " has the key " + key + ", at x=" + coord.getX() + " y=" + coord.getY();
 	}
 }
