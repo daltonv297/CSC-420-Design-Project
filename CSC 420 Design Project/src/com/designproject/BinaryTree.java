@@ -10,7 +10,7 @@ import java.util.Stack;
 public class BinaryTree {
 
 	private Node root;
-	private int height;
+	private int height;		//height of tree
 	private int windowHeight;
 	private int windowWidth;
 	private int nodeSize;
@@ -29,7 +29,7 @@ public class BinaryTree {
 		return root;
 	}
 
-	public ArrayList<ArrayList<Node>> getLevelOrder() {
+	public ArrayList<ArrayList<Node>> getLevelOrder() {		//returns a list of every level in the tree
 	    ArrayList<ArrayList<Node>> listOfLevels = new ArrayList<ArrayList<Node>>();
 	    ArrayList<Node> nodes = new ArrayList<Node>();
 	    if(root == null)
@@ -91,10 +91,15 @@ public class BinaryTree {
 	
 	public void generateTree(int height) {
 		
-		Queue<Integer> q = new LinkedList<Integer>();
-		Stack<Integer> s = new Stack<Integer>();
+		/*
+		 * This generateTree algorithm adds nodes using addNode(), while maintaining a binary search tree.
+		 * It does this by rearranging a queue of ordered keys into a stack that can be added to the tree sequentially.
+		 */
 		
-		int refInt;
+		Queue<Integer> q = new LinkedList<Integer>();		//starting queue
+		Stack<Integer> s = new Stack<Integer>();			//final stack
+		
+		int refInt;		//this is the key that tells the method that it has wrapped around
 		int tempInt = 0;
 		boolean addToStack = true;
 		boolean skipRef = true;
@@ -111,7 +116,7 @@ public class BinaryTree {
 		
 		refInt = numberOfNodes - 2;
 		
-		while (!q.isEmpty())  {
+		while (!q.isEmpty())  {		//adds every other key in the queue to the stack, all others get re-added into the queue
 			
 			if (addToStack) {
 				s.push(q.remove());
@@ -133,33 +138,35 @@ public class BinaryTree {
 			}
 		}
 		int stackSize = s.size();
-		for (int i = 0; i < stackSize; i++) {
+		for (int i = 0; i < stackSize; i++) {		//stack is now in the correct order, adds nodes
 			addNode(i, s.pop());
 		}
 		
-		setLeaves(root);
+		setLeaves(root);	//calls method to add leaves of the tree to the leaves list
 		
 		if(leaves.size() > 30)
-			setNodeLocations(50, 50);
+			setNodeLocations(50, 50);	//makes the margins smaller for bigger trees
 		else
 			setNodeLocations(100, 100);
+		
+		randomizeTree(20);
 	}
 	
 	public void setNodeLocations(int xMargin, int yMargin) {
 		ArrayList<ArrayList<Node>> list = getLevelOrder();
 		
-		int minHorizontalSpace = (windowWidth - xMargin * 2) / (leaves.size() - 1);
+		int minHorizontalSpace = (windowWidth - xMargin * 2) / (leaves.size() - 1);		//horizontal space between leaves
 		
-		int verticalSpace = (windowHeight - yMargin * 2) / height + 1;
+		int verticalSpace = (windowHeight - yMargin * 2) / height + 1;		//vertical space between all nodes
 		
-		for (int i = 0; i < leaves.size(); i++) {
+		for (int i = 0; i < leaves.size(); i++) {		//sets leaf locations
 			if (i == 0)
 				leaves.get(i).coord.setLocation(xMargin - nodeSize / 2, windowHeight - yMargin - nodeSize);
 			else
 				leaves.get(i).coord.setLocation(leaves.get(i - 1).coord.getX() + minHorizontalSpace, windowHeight - yMargin - nodeSize);
 		}
 		
-		for (int i = list.size() - 2; i >= 0; i--) {
+		for (int i = list.size() - 2; i >= 0; i--) {		//sets all other node location to the average of its children's x coordinates
 			
 			for (int j = 0; j < list.get(i).size(); j++) {
 				Node node = list.get(i).get(j);
@@ -273,7 +280,7 @@ public class BinaryTree {
  
     }
 	
-	public void setLeaves(Node focusNode) {
+	public void setLeaves(Node focusNode) {		//preorder traversal, check if a node is a leaf and adds it.
 		if (focusNode != null) {
 			if (focusNode.leftChild == null && focusNode.rightChild == null)
 				leaves.add(focusNode);
@@ -311,7 +318,7 @@ public class BinaryTree {
 		}
 	}
 	
-	public void shiftUp(Node leaf) {
+	public void shiftUp(Node leaf) {		//shifts node values up in its path
 		Node focusNode = leaf;
 		while (focusNode != null) {
 			focusNode.tempValue = focusNode.value;
@@ -323,7 +330,7 @@ public class BinaryTree {
 			focusNode.parent.value = focusNode.tempValue;
 			focusNode = focusNode.parent;
 		}
-		leaf.value = focusNode.tempValue;
+		leaf.value = focusNode.tempValue;		//sets selected leaf value to the root's value
 		
 		setLeaves(root);
 	}
@@ -392,6 +399,9 @@ public class BinaryTree {
 				moves.add(new Move("up", index));
 			}
 		}
+		
+		if (isSolved())
+			randomizeTree(amount);
 	}
 	
 	public void addMove(String move, int index) {
@@ -414,6 +424,24 @@ public class BinaryTree {
 		}
 
 		return 0;
+	}
+	
+	public boolean isSolved() {
+		ArrayList<ArrayList<Node>> list = getLevelOrder();
+		int counter = 0;
+		boolean isSolved = true;
+		
+		for (int i = 0; i < list.size(); i++) {
+			for (int j = 0; j < list.get(i).size(); j++) {
+				if (list.get(i).get(j).value != counter) {
+					isSolved = false;
+					break;
+				}
+				counter++;
+			}
+		}
+		
+		return isSolved;
 	}
 	
 	

@@ -18,32 +18,30 @@ public class Game extends Canvas implements Runnable {
 	public static final double aspectRatio = 16D / 9D;				//sets window resolution and aspect ratio
 	public static final int HEIGHT = 720;
 	public static final int WIDTH = (int) (HEIGHT * aspectRatio);
-	public static final String NAME = "TreeFiddy";
+	public static final String NAME = "TreeFiddy";		//name of window
 	
 	private JFrame frame;
 	public static Menu menu;
 	
 	private BinaryTree tree;
-	private ArrayList<Node> leaves;
+	private ArrayList<Node> leaves;		//arraylist of leaves in the tree
 	
-	private Pointer pointer;
+	private Pointer pointer;	//red arrow that designates the selected node
 	
 	public boolean running = false;
 	public int tickCount = 0;
 	
-	int nodeSize = 40;
+	int nodeSize = 40;		//size of each node
 	
 	public enum STATE {
 		MENU,
-		GAME
+		GAME,
+		SOLVED
 	};
 	
-	public static STATE state = STATE.MENU;
+	public static STATE state = STATE.MENU;		//start game in menu
 	
-	//private BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-	//private int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();	//gets pixel array from raster image
-	
-	Image pointerImg;
+	Image pointerImg;		//image of our arrow
 	
 	public Input input;
 	
@@ -73,6 +71,7 @@ public class Game extends Canvas implements Runnable {
 	
 	public void init() {
 		input = new Input(this);
+		
 		try {
 			pointerImg = ImageIO.read(new File("res/pointer.png"));
 		} catch (IOException e) {
@@ -145,16 +144,23 @@ public class Game extends Canvas implements Runnable {
 		
 		if (state == STATE.GAME) {
 			if (tree == null)
-				tree = new BinaryTree(menu.getHeight(), getWidth(), getHeight(), nodeSize);
+				tree = new BinaryTree(menu.getHeight(), getWidth(), getHeight(), nodeSize);		//initializes tree when game starts
 			if (pointer == null)
 				pointer = new Pointer(tree.getLeaf(0), 0);
 			tickCount++;
-			pollInputs();
+			pollInputsGame();
+			
+			if (tree.isSolved()) {
+				System.out.println("Solved!");
+				state = STATE.SOLVED;
+			}
+		} else if (state == STATE.SOLVED) {
+			waitForInput();
 		}
 		
 	}
 	
-	public void pollInputs() {
+	public void pollInputsGame() {
 		if (input.up.isPressed()) {
 			tree.shiftUp(pointer.getNode());
 			tree.addMove("up", pointer.getIndex());
@@ -183,6 +189,19 @@ public class Game extends Canvas implements Runnable {
 		}
 	}
 	
+	public void waitForInput() {
+		if (input.up.isPressed() || input.down.isPressed() || input.left.isPressed() || input.right.isPressed()) {
+			input.up.setReleased();
+			input.down.setReleased();
+			input.left.setReleased();
+			input.right.setReleased();
+			
+			tree = null;
+			pointer = null;
+			state = STATE.MENU;
+		}
+	}
+	
 	public void render() {
 		BufferStrategy bs = getBufferStrategy();	//a BufferStrategy object contains the mechanism of how complex 
 													//memory will be organized on our Canvas
@@ -204,18 +223,22 @@ public class Game extends Canvas implements Runnable {
 					pointerImg.getWidth(this), pointerImg.getHeight(this), this);
 		} else if (state == STATE.MENU) {
 			menu.render(g);
+		} else if (state == STATE.SOLVED) {
+			g.setFont(new Font("arial", Font.PLAIN, 50));
+			String won = "YOU WON!";
+			g.drawString(won, (int) (getWidth() / 2 - getTextCenter(g, won).getX()), (int) (getHeight() / 2 - getTextCenter(g, won).getY()));
 		}
 		
 		g.dispose();
 		bs.show();
 	}
 	
-	public void drawTree(Graphics2D g, Node focusNode) {
+	public void drawTree(Graphics2D g, Node focusNode) {		//preorder traversal to get node coordinates and draw them to the screen
 		if (focusNode != null) {
 			g.setColor(Color.YELLOW);
 			g.fillOval(focusNode.coord.x, focusNode.coord.y, nodeSize, nodeSize);
 			g.setColor(Color.BLACK);
-			g.setFont(new Font("arial", Font.BOLD, 20));
+			g.setFont(new Font("arial", Font.BOLD, 25));
 			String number = "" + focusNode.value;
 			g.drawString(number, (int) (focusNode.coord.getX() + nodeSize / 2 - getTextCenter(g, number).getX()), 
 					(int) (focusNode.coord.getY() + nodeSize / 2 + getTextCenter(g, number).getY()) - 4);
@@ -231,14 +254,14 @@ public class Game extends Canvas implements Runnable {
 		}
 	}
 	
-	public Point getTextCenter(Graphics2D g, String s) {
+	public Point getTextCenter(Graphics2D g, String s) {	//gets center of rectangle around text
 		Rectangle2D rect = g.getFontMetrics().getStringBounds(s, g);
 		return new Point((int) (rect.getWidth() / 2), (int) (rect.getHeight() / 2));
 	}
 
 	
 	
-	public Point getMiddle(int widthOfShape, int heightOfShape) {
+	public Point getMiddle(int widthOfShape, int heightOfShape) {	//gets middle of screen, compensating for width and height of the shape
 		return new Point(getWidth() / 2 - widthOfShape / 2, getHeight() / 2 - heightOfShape / 2);
 	}
 	

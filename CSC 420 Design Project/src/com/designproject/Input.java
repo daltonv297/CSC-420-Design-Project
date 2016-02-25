@@ -58,7 +58,7 @@ public class Input implements KeyListener, MouseListener {
 		
 		if (Game.menu.b2.contains(e.getPoint())) {
 			if (Game.menu.getHeight() > 4) {
-				Game.menu.setHeight(2);
+				Game.menu.setHeight(1);
 			} else {
 				Game.menu.setHeight(Game.menu.getHeight() + 1);
 			}
